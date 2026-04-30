@@ -1,0 +1,46 @@
+name: Auto Update Changelog
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  update-changelog:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.My_GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Generate Changelog
+        run: |
+          touch CHANGELOG.md
+          # Get last tag; if none exists, include all commits
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [ -z "$LAST_TAG" ]; then
+              # No tag found, include all commits
+              git log --pretty=format:"- %s (%h)" >> CHANGELOG.md
+          else
+              # Commits since last tag
+              git log --pretty=format:"- %s (%h)" $LAST_TAG..HEAD >> CHANGELOG.md
+          fi
+          echo "" >> CHANGELOG.md
+
+      - name: Commit Changelog
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add CHANGELOG.md
+          git commit -m "chore: update changelog [skip ci]" || echo "No changes to commit"
+          # Use My_GITHUB_TOKEN directly in push URL
+          git push https://${{ github.actor }}:${{ secrets.My_GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+        env:
+          My_GITHUB_TOKEN: ${{ secrets.My_GITHUB_TOKEN }}

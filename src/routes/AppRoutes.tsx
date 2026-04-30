@@ -1,0 +1,116 @@
+import RegistrationLayout from '@/components/layouts/RegistrationLayout';
+import ErrorPage from '@/pages/ErrorPage';
+import Home from '@/pages/Home';
+import PageNotFound from '@/pages/PageNotFound';
+import { createBrowserRouter, RouterProvider } from 'react-router';
+import Login from '@/pages/registration/Login';
+import { buildRoute } from './BuildRoutes';
+import { routes } from './routes.config';
+import Signup from '@/pages/registration/Signup';
+import HomeLayout from '@/components/layouts/HomeLayout';
+import AppLayout from '@/components/layouts/AppLayout';
+import TermsOfService from '@/pages/TermsOfService';
+import VerifyEmailwithOTP from '@/pages/registration/VerifyEmailwithOTP';
+import ForgetPassword from '@/pages/registration/ForgetPassword';
+import DashboardLayout from '@/components/layouts/DashboardLayout';
+import Overview from '@/pages/dashboard/Overview';
+
+const router = createBrowserRouter([
+  {
+    element: <RegistrationLayout />,
+    errorElement: <ErrorPage />,
+    children: [
+      buildRoute({
+        config: routes.SIGNUP,
+        element: <Signup />,
+        extraWrappers: [
+          {
+            redirectPath: routes.DASHBOARD.overview.path,
+            shouldRedirectIfLoggedIn: true,
+            isFullScreenLoader: false,
+          },
+        ],
+      }),
+      buildRoute({
+        config: routes.LOGIN,
+        element: <Login />,
+        extraWrappers: [
+          {
+            redirectPath: routes.DASHBOARD.overview.path,
+            shouldRedirectIfLoggedIn: true,
+            isFullScreenLoader: false,
+          },
+        ],
+      }),
+      buildRoute({
+        config: routes.VERIFY_EMAIL,
+        element: <VerifyEmailwithOTP />,
+        extraWrappers: [
+          {
+            redirectPath: routes.DASHBOARD.overview.path,
+            shouldRedirectIfLoggedIn: true,
+            isFullScreenLoader: false,
+          },
+        ],
+      }),
+      buildRoute({
+        config: routes.FORGET_PASSWORD,
+        element: <ForgetPassword />,
+        extraWrappers: [
+          {
+            redirectPath: routes.HOME.path,
+            shouldRedirectIfLoggedIn: true,
+            isFullScreenLoader: false,
+          },
+        ],
+      }),
+    ],
+  },
+  {
+    element: <HomeLayout />,
+    errorElement: <ErrorPage />,
+    children: [
+      buildRoute({
+        config: routes.HOME,
+        element: <Home />,
+      }),
+    ],
+  },
+  {
+    element: <AppLayout />,
+    errorElement: <ErrorPage />,
+    children: [
+      buildRoute({
+        config: routes.TERMS,
+        element: <TermsOfService />,
+      }),
+    ],
+  },
+  {
+    element: <DashboardLayout />,
+    errorElement: <ErrorPage />,
+    children: [
+      buildRoute({
+        config: routes.DASHBOARD.overview,
+        element: <Overview />,
+        extraWrappers: [
+          {
+            redirectPath: routes.HOME.path,
+            shouldRedirectIfLoggedIn: false,
+            isFullScreenLoader: true,
+          },
+        ],
+      }),
+    ],
+  },
+  {
+    path: '*',
+    element: <PageNotFound />,
+  },
+]);
+
+const AppRoutes = () => {
+  return <RouterProvider router={router} />;
+};
+
+export default AppRoutes;
