@@ -13,7 +13,13 @@ import TermsOfService from '@/pages/TermsOfService';
 import VerifyEmailwithOTP from '@/pages/registration/VerifyEmailwithOTP';
 import ForgetPassword from '@/pages/registration/ForgetPassword';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
+import Tasks from '@/pages/Tasks';
+import Habits from '@/pages/Habits';
+import { Settings } from '@/pages/Settings';
+import Account from '@/pages/Account';
 import Overview from '@/pages/dashboard/Overview';
+import Groups from '@/pages/Groups';
+import Progress from '@/pages/Progress';
 
 const router = createBrowserRouter([
   {
@@ -25,7 +31,7 @@ const router = createBrowserRouter([
         element: <Signup />,
         extraWrappers: [
           {
-            redirectPath: routes.DASHBOARD.overview.path,
+            redirectPath: routes.DASHBOARD.index.path,
             shouldRedirectIfLoggedIn: true,
             isFullScreenLoader: false,
           },
@@ -36,7 +42,7 @@ const router = createBrowserRouter([
         element: <Login />,
         extraWrappers: [
           {
-            redirectPath: routes.DASHBOARD.overview.path,
+            redirectPath: routes.DASHBOARD.index.path,
             shouldRedirectIfLoggedIn: true,
             isFullScreenLoader: false,
           },
@@ -47,7 +53,7 @@ const router = createBrowserRouter([
         element: <VerifyEmailwithOTP />,
         extraWrappers: [
           {
-            redirectPath: routes.DASHBOARD.overview.path,
+            redirectPath: routes.DASHBOARD.index.path,
             shouldRedirectIfLoggedIn: true,
             isFullScreenLoader: false,
           },
@@ -91,7 +97,7 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [
       buildRoute({
-        config: routes.DASHBOARD.overview,
+        config: routes.DASHBOARD.index,
         element: <Overview />,
         extraWrappers: [
           {
@@ -101,6 +107,73 @@ const router = createBrowserRouter([
           },
         ],
       }),
+      buildRoute({
+        config: routes.DASHBOARD.tasks,
+        element: <Tasks />,
+        extraWrappers: [
+          {
+            redirectPath: routes.HOME.path,
+            shouldRedirectIfLoggedIn: false,
+            isFullScreenLoader: true,
+          },
+        ],
+      }),
+      buildRoute({
+        config: routes.DASHBOARD.habit,
+        element: <Habits />,
+        extraWrappers: [
+          {
+            redirectPath: routes.HOME.path,
+            shouldRedirectIfLoggedIn: false,
+            isFullScreenLoader: true,
+          },
+        ],
+      }),
+      buildRoute({
+        config: routes.DASHBOARD.progress,
+        element: <Progress />,
+        extraWrappers: [
+          {
+            redirectPath: routes.HOME.path,
+            shouldRedirectIfLoggedIn: false,
+            isFullScreenLoader: true,
+          },
+        ],
+      }),
+      buildRoute({
+        config: routes.DASHBOARD.settings,
+        element: <Settings />,
+        extraWrappers: [
+          {
+            redirectPath: routes.HOME.path,
+            shouldRedirectIfLoggedIn: false,
+            isFullScreenLoader: true,
+          },
+        ],
+      }),
+      buildRoute({
+        config: routes.DASHBOARD.goups,
+        element: <Groups />,
+        extraWrappers: [
+          {
+            redirectPath: routes.HOME.path,
+            shouldRedirectIfLoggedIn: false,
+            isFullScreenLoader: true,
+          },
+        ],
+      }),
+      buildRoute({
+        config: routes.DASHBOARD.profile,
+        element: <Account />,
+        extraWrappers: [
+          {
+            redirectPath: routes.HOME.path,
+            shouldRedirectIfLoggedIn: false,
+            isFullScreenLoader: true,
+          },
+        ],
+      }),
+      
     ],
   },
   {

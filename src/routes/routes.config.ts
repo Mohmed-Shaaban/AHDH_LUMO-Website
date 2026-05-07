@@ -31,11 +31,14 @@ export const routes: RoutesMap<typeof PATHS> = {
   TERMS: {
     path: PATHS.TERMS,
   },
-  DASHBOARD: {
-    index: { path: PATHS.DASHBOARD.index },
-    overview: { path: PATHS.DASHBOARD.overview },
-    profile: { path: PATHS.DASHBOARD.profile },
+    DASHBOARD: {
+    index: {path:PATHS.DASHBOARD.index},
+    tasks:{path:PATHS.DASHBOARD.tasks},
+    habit: { path: PATHS.DASHBOARD.habit },
+    goups: { path: PATHS.DASHBOARD.goups },
+    progress: { path: PATHS.DASHBOARD.progress },
     settings: { path: PATHS.DASHBOARD.settings },
+    profile: { path: PATHS.DASHBOARD.profile },
   },
   PROFILE: {
     path: PATHS.PROFILE,

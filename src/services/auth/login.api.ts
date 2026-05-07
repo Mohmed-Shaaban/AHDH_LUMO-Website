@@ -8,6 +8,7 @@ import axiosInstance from '../axiosInstance';
 import { API_ENDPOINTS } from '../api.endpoints';
 
 const login = async (payload: loginPayloadT): Promise<loginResponseT> => {
+  console.log(payload)
   try {
     const response = await axiosInstance.post(
       API_ENDPOINTS.auth.login(),

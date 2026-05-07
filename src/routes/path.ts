@@ -61,9 +61,12 @@ export const PATHS = {
   FORGET_PASSWORD: '/forget-password',
   TERMS: '/terms-of-service',
   DASHBOARD: buildRouteGroup('/dash', {
-    overview: '/overview', // => /dash/overview
-    profile: '/profile', // => /dash/profile
+    tasks:'/tasks',
+    habit:'/habits',
+    goups:'/groups',
+    progress: '/progress', // => /dash/overview
     settings: '/settings', // => /dash/settings
+    profile: '/profile', // => /dash/profile
   }),
   PROFILE: '/profile',
 } as const;
