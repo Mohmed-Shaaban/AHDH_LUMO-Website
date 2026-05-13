@@ -1,6 +1,9 @@
-import axiosInstance from '@/services/axiosInstance';
-import axios from 'axios';
-import { useEffect } from 'react';
+import CreateSectionModal from '@/components/CreateSectionModal';
+import { TaskBoard } from '@/components/TaskBoard';
+import { Spinner } from '@/components/ui/spinner';
+import useSections from '@/features/sections/useSections';
+import type { Section } from '@/types';
+
 
 /*
 
@@ -108,27 +111,65 @@ true
 */
 
 const Tasks = () => {
-  useEffect(() => {
-    const getResponse = async () => {
-      try {
-        // Use 'api' instead of 'fetch' so your middleware/interceptors work
-        const res = await axiosInstance.get('/tasks'); 
+  const {sections:sectionsData,loadingSections} = useSections()
+  console.log(sectionsData)
+  // useEffect(() => {
+  //   const getResponse = async () => {
+  //     try {
+  //       // Use 'api' instead of 'fetch' so your middleware/interceptors work
+  //       const res = await axiosInstance.get('/tasks'); 
         
-        console.log("--- Axios Response Data ---");
-        console.log(res.data); // Axios puts the response body in .data
-      } catch (error: unknown) {
-        if(axios.isAxiosError(error))
-        console.error("Axios error:", error.response?.status, error.message);
-      }
-    };
+  //       console.log("--- Axios Response Data ---");
+  //       console.log(res.data); // Axios puts the response body in .data
+  //     } catch (error: unknown) {
+  //       if(axios.isAxiosError(error))
+  //       console.error("Axios error:", error.response?.status, error.message);
+  //     }
+  //   };
 
-    getResponse();
-  }, []);
+  //   getResponse();
+  // }, []);
+
+//   const SECTIONS: Section[] = [
+//   {
+//     id: 1,
+//     name: "Pending",
+//     description: "Tasks yet to be done",
+//     order: 0,
+//     createdAt: new Date().toISOString(),
+//     updatedAt: new Date().toISOString(),
+//   },
+//   {
+//     id: 2,
+//     name: "Completed",
+//     description: "Finished tasks",
+//     order: 1,
+//     createdAt: new Date().toISOString(),
+//     updatedAt: new Date().toISOString(),
+//   },
+//   {
+//     id: 3,
+//     name: "English",
+//     description: "English course tasks",
+//     order: 2,
+//     createdAt: new Date().toISOString(),
+//     updatedAt: new Date().toISOString(),
+//   },
+// ];
+
+  if(loadingSections) return <Spinner/>
 
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold">Tasks Page</h1>
-      <p className="text-gray-500">Check the browser console (F12) to see the response.</p>
+    <div className="flex-1 flex flex-col gap-y-5 max-w-6xl mx-auto">
+      {
+        sectionsData?.length === 0 ? <div>
+          <p>No sections Add one</p>
+        </div>:
+      <TaskBoard sections={sectionsData as Section[]}/>
+      }
+      <div>
+        <CreateSectionModal/>
+      </div>
     </div>
   );
 };

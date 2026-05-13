@@ -30,7 +30,7 @@ const FormLogin = ({ classNames = {} }: IProps) => {
     reValidateMode: 'onChange',
     defaultValues: {
       username: 'johndoe',
-      password: 'SecurePass123',
+      password: 'SecurePass123!',
     },
   });
   const [isAgree, setIsAgree] = useState<boolean>(false);

@@ -20,8 +20,8 @@ const DashboardContent = () => {
       }}
     >
       {/* <Navbar /> */}
-      <main className="dark:bg-background flex-1 overflow-auto bg-purple-50/50">
-        <div className="mx-auto my-5! flex flex-col px-4! sm:px-6! lg:px-8!">
+      <main className="dark:bg-background flex-1 ">
+        <div className="mx-auto my-5! px-4! sm:px-6! lg:px-8! h-full flex">
           <Toaster className="select-none" />
           <Outlet />
         </div>
