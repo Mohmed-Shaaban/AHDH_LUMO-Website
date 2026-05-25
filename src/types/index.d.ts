@@ -100,4 +100,78 @@ export interface UpdateTaskPayload extends Partial<CreateTaskPayload> {
   id: number;
 }
 
+export interface Group {
+  id: number;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+  createdBy: number | null;
+  updatedBy: number | null;
+  deletedBy: number | null;
+  name: string;
+  description: string;
+  creatorId: number;
+  category: string;
+  color: string;
+  isPublic: boolean;
+  invitationCode: string;
+  maxMembers: number;
+  currentMemberCount: number;
+  coverImage: string | null;
+  tags: string[];
+}
+
+export interface GroupMember {
+  id: number;
+  userId: number;
+  fullName: string;
+  username: string;
+  profilePicture: string | null;
+  role: "creator" | "admin" | "member";
+  joinedAt: string;
+  isTopPerformer: boolean;
+}
+
+export type ActivityType =
+  | "member_joined"
+  | "member_left"
+  | "group_updated"
+  | "resource_shared"
+  | "session_started"
+  | "milestone_reached";
+
+
+export interface GroupActivity {
+  id: number;
+  groupId: number;
+  userId: number;
+  userFullName: string;
+  userProfilePicture: string | null;
+  type: ActivityType;
+  message: string;
+  metadata: Record<string, unknown> | null;
+  createdAt: string;
+}
+
+export interface CreateGroupPayload {
+  name: string;
+  description: string;
+  category: string;
+  color: string;
+  isPublic: boolean;
+  maxMembers: number;
+  tags: string[];
+}
+
+export interface PostActivityPayload {
+  type: ActivityType;
+  message: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface RegenerateCodeResponse {
+  invitationCode: string;
+}
+
+
 

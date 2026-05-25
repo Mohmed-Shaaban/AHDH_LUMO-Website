@@ -20,6 +20,7 @@ import Account from '@/pages/Account';
 import Overview from '@/pages/dashboard/Overview';
 import Groups from '@/pages/Groups';
 import Progress from '@/pages/Progress';
+import { GroupDetailPage } from '@/pages/GroupDetailPage';
 
 const router = createBrowserRouter([
   {
@@ -165,6 +166,17 @@ const router = createBrowserRouter([
       buildRoute({
         config: routes.DASHBOARD.profile,
         element: <Account />,
+        extraWrappers: [
+          {
+            redirectPath: routes.HOME.path,
+            shouldRedirectIfLoggedIn: false,
+            isFullScreenLoader: true,
+          },
+        ],
+      }),
+      buildRoute({
+        config: routes.DASHBOARD.groupDetail,
+        element: <GroupDetailPage />,
         extraWrappers: [
           {
             redirectPath: routes.HOME.path,

@@ -39,6 +39,7 @@ export const routes: RoutesMap<typeof PATHS> = {
     progress: { path: PATHS.DASHBOARD.progress },
     settings: { path: PATHS.DASHBOARD.settings },
     profile: { path: PATHS.DASHBOARD.profile },
+    groupDetail:{path:PATHS.DASHBOARD.groupDetail}
   },
   PROFILE: {
     path: PATHS.PROFILE,

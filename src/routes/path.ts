@@ -67,6 +67,7 @@ export const PATHS = {
     progress: '/progress', // => /dash/overview
     settings: '/settings', // => /dash/settings
     profile: '/profile', // => /dash/profile
+    groupDetail:'/groups/:id'
   }),
   PROFILE: '/profile',
 } as const;

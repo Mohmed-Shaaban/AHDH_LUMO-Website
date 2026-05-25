@@ -1,4 +1,12 @@
-import { CircleUser, Settings, Users, ChartSpline, CircleCheck,House } from 'lucide-react';
+import {
+  CircleUser,
+  Settings,
+  Users,
+  ChartSpline,
+  CircleCheck,
+  House,
+} from 'lucide-react';
+
 import {
   Sidebar,
   SidebarContent,
@@ -9,6 +17,7 @@ import {
   SidebarMenuItem,
   SidebarTrigger,
 } from './ui/sidebar';
+
 import { Link, useLocation } from 'react-router';
 import { routes } from '@/routes/routes.config';
 
@@ -50,66 +59,35 @@ const items: ISidebarItem[] = [
     url: routes.DASHBOARD.settings.path,
     icon: Settings,
   },
-  // {
-  //   title: 'Account',
-  //   url: routes.DASHBOARD.profile.path,
-  //   icon: CircleUser,
-  // },
-  // {
-  //   title: 'Tasks',
-  //   icon: SquareCheckBig,
-  //   children: [
-  //     {
-  //       title: 'Show Tickets',
-  //       url: '/dash/tickets/show',
-  //       icon: Eye,
-  //     },
-  //     {
-  //       title: 'Unassigned Tickets',
-  //       url: '/dash/tickets/unassigned',
-  //       icon: SquareCheckBig,
-  //     },
-  //     {
-  //       title: 'Manage Tickets',
-  //       url: '/dash/tickets/manage',
-  //       icon: Edit,
-  //     },
-  //   ],
-  // },
-  // {
-  //   title: 'Page-2',
-  //   url: '/dash/page-2',
-  //   icon: Settings,
-  // },
-  // {
-  //   title: 'Page-3',
-  //   url: '/dash/page-3',
-  //   icon: Settings,
-  // },
-  // {
-  //   title: 'Page-4',
-  //   url: '/dash/page-4',
-  //   icon: Settings,
-  // },
 ];
 
 const AppSidebar = () => {
   const location = useLocation();
 
   return (
-    <Sidebar className="mt-auto! h-[calc(100%-4rem)]! w-[16rem] shrink-0 ">
+    <Sidebar className="mt-auto! h-[calc(100%-4rem)]! w-[16rem] shrink-0">
       <SidebarTrigger className="absolute top-2 -right-7 cursor-pointer rounded-md rounded-l-none border border-l-0 border-zinc-500 bg-zinc-500/40" />
+
       <SidebarContent>
-        {/* <SidebarGroupLabel>Dashboard</SidebarGroupLabel> */}
-        <SidebarGroupContent className='py-10!'>
-          <SidebarMenu className='flex flex-col h-full'>
+        <SidebarGroupContent className="py-10!">
+          <SidebarMenu className="flex h-full flex-col">
             {items.map((item) => {
+              const isHome =
+                item.url === routes.DASHBOARD.index.path;
+
+              const isActive = isHome
+                ? location.pathname === item.url
+                : location.pathname.startsWith(item.url!);
+
               return (
-                <SidebarMenuItem className={`px-4! py-2!`} key={item.title}>
+                <SidebarMenuItem
+                  className="px-4! py-2!"
+                  key={item.title}
+                >
                   <SidebarMenuButton
                     className={`${
-                      location.pathname === item.url ? 'bg-indigo-800' : ''
-                    } rounded-md py-5! px-2! `}
+                      isActive ? 'bg-indigo-800' : ''
+                    } rounded-md py-5! px-2!`}
                     asChild
                   >
                     <Link to={item.url!}>
@@ -123,21 +101,28 @@ const AppSidebar = () => {
           </SidebarMenu>
         </SidebarGroupContent>
       </SidebarContent>
-            <SidebarFooter className='pb-10!'>
-              <SidebarMenu>
-            <SidebarMenuItem className="px-4! py-2!">
-              <SidebarMenuButton
-                className={`${location.pathname === routes.DASHBOARD.profile.path ? 'bg-indigo-800' : ''} rounded-md !py-5 !px-2`}
-                asChild
-              >
-                <Link to={routes.DASHBOARD.profile.path}>
-                  <CircleUser className="mr-2" />
-                  <span>{'Account'}</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-            </SidebarFooter>
+
+      <SidebarFooter className="pb-10!">
+        <SidebarMenu>
+          <SidebarMenuItem className="px-4! py-2!">
+            <SidebarMenuButton
+              className={`${
+                location.pathname.startsWith(
+                  routes.DASHBOARD.profile.path
+                )
+                  ? 'bg-indigo-800'
+                  : ''
+              } rounded-md !py-5 !px-2`}
+              asChild
+            >
+              <Link to={routes.DASHBOARD.profile.path}>
+                <CircleUser className="mr-2" />
+                <span>Account</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   );
 };
