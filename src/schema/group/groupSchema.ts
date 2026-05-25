@@ -18,6 +18,24 @@ export const createGroupSchema = z.object({
     .max(500, "Max 500 members"),
   tags: z.array(z.string()).max(5, "Max 5 tags").default([]),
 });
+export const updateGroupSchema = z.object({
+  name: z.string().min(3).max(60).optional(),
+  description: z.string().min(10).max(300).optional(),
+  category: z.string().optional(),
+  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional(),
+  isPublic: z.boolean().optional(),
+
+  maxMembers: z.coerce
+    .number()
+    .min(2)
+    .max(500)
+    .optional(),
+
+  tags: z.array(z.string()).max(5).optional(),
+});
+
+export type UpdateGroupFormValues =
+  z.infer<typeof updateGroupSchema>;
 
 export type CreateGroupFormValues = z.infer<typeof createGroupSchema>;
 

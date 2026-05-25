@@ -172,6 +172,14 @@ export interface PostActivityPayload {
 export interface RegenerateCodeResponse {
   invitationCode: string;
 }
-
+export interface UpdateGroupPayload {
+  name?: string;
+  description?: string;
+  category?: string;
+  color?: string;
+  isPublic?: boolean;
+  maxMembers?: number;
+  tags?: string[];
+}
 
 

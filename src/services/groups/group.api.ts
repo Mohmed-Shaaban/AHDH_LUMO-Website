@@ -1,5 +1,5 @@
 
-import type { ApiResponse, CreateGroupPayload, Group, GroupActivity, GroupMember, PostActivityPayload, RegenerateCodeResponse } from "@/types";
+import type { ApiResponse, CreateGroupPayload, Group, GroupActivity, GroupMember, PostActivityPayload, RegenerateCodeResponse, UpdateGroupPayload } from "@/types";
 import axiosInstance from "../axiosInstance";
 
 export const getGroups = () =>
@@ -50,4 +50,24 @@ export const postGroupActivity = (id: number, payload: PostActivityPayload) =>
 export const regenerateInviteCode = (id: number) =>
   axiosInstance
     .post<ApiResponse<RegenerateCodeResponse>>(`/groups/${id}/regenerate-code`)
+    .then((r) => r.data);
+
+export const updateGroup = (id: number, payload: UpdateGroupPayload) =>
+  axiosInstance
+    .patch<ApiResponse<Group>>(`/groups/${id}`, payload)
+    .then((r) => r.data);
+ 
+export const leaveGroup = (id: number) =>
+  axiosInstance
+    .post<ApiResponse<null>>(`/groups/${id}/leave`)
+    .then((r) => r.data);
+ 
+export const deleteGroup = (id: number) =>
+  axiosInstance
+    .delete<ApiResponse<null>>(`/groups/${id}`)
+    .then((r) => r.data);
+ 
+export const kickMember = (groupId: number, userId: number) =>
+  axiosInstance
+    .delete<ApiResponse<null>>(`/groups/${groupId}/members/${userId}`)
     .then((r) => r.data);

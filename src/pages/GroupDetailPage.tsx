@@ -1,4 +1,5 @@
-import { useParams, useNavigate } from "react-router";
+import { useState } from "react";
+import { useParams, useNavigate, data } from "react-router";
 import { formatDistanceToNow } from "date-fns";
 import {
   ArrowLeft,
@@ -10,6 +11,10 @@ import {
   Rss,
   Trophy,
   Paperclip,
+  Pencil,
+  LogOut,
+  Trash2,
+  UserMinus,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -20,12 +25,34 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 import { cn } from "@/lib/utils";
-import { useGroup, useGroupActivity, useGroupMembers, useJoinGroup, useRegenerateCode } from "@/features/groups/useGroup";
+import {
+  useGroup,
+  useGroupActivity,
+  useGroupMembers,
+  useRegenerateCode,
+  useLeaveGroup,
+  useDeleteGroup,
+} from "@/features/groups/useGroup";
 import type { GroupActivity, GroupMember } from "@/types";
+import { KickMemberDialog } from "@/components/Kickmemberdialog";
+import { UpdateGroupDialog } from "@/components/Updategroupdialog ";
+import { useAuthContext } from "@/providers/context/auth-context/AuthContext";
+
 
 const ACTIVITY_ICONS: Record<string, React.ReactNode> = {
   member_joined: <UserPlus className="h-4 w-4 text-green-500" />,
@@ -50,18 +77,50 @@ export function GroupDetailPage() {
   const navigate = useNavigate();
   const groupId = Number(id);
 
+  // ── Dialog state ──────────────────────────────────────────────────────────
+  const [updateOpen, setUpdateOpen] = useState(false);
+  const [leaveOpen, setLeaveOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [kickTarget, setKickTarget] = useState<GroupMember | null>(null);
+
+  // ── Data ──────────────────────────────────────────────────────────────────
   const { data: groupRes, isLoading: groupLoading } = useGroup(groupId);
   const { data: activityRes, isLoading: activityLoading } =
     useGroupActivity(groupId);
   const { data: membersRes, isLoading: membersLoading } =
     useGroupMembers(groupId);
-  const { mutate: join, isPending: joining } = useJoinGroup();
+
+  // ── Mutations ─────────────────────────────────────────────────────────────
+  // const { mutate: join, isPending: joining } = useJoinGroup();
   const { mutate: regen, isPending: regening } = useRegenerateCode();
+  const { mutate: leave, isPending: leaving } = useLeaveGroup();
+  const { mutate: deleteGroup, isPending: deleting } = useDeleteGroup();
 
   const group = groupRes?.data;
   const activities = activityRes?.data ?? [];
   const members = membersRes?.data ?? [];
 
+  // Determine if the current user is the creator.
+  // Replace `currentUserId` with however you access the authenticated user's id
+  // (e.g. from an auth context/store). Adjust as needed for your app.
+  const { dataUser } = useAuthContext();
+  const currentUserId: number | undefined = dataUser?.id; // ← wire your auth user id here
+  const isCreator = group?.creatorId === currentUserId;
+
+  // ── Handlers ─────────────────────────────────────────────────────────────
+  const handleLeaveConfirm = () => {
+    leave(groupId, {
+      onSuccess: () => navigate("/groups"),
+    });
+  };
+
+  const handleDeleteConfirm = () => {
+    deleteGroup(groupId, {
+      onSuccess: () => navigate("/groups"),
+    });
+  };
+
+  // ── Render ────────────────────────────────────────────────────────────────
   if (groupLoading) return <GroupDetailSkeleton />;
   if (!group)
     return (
@@ -74,7 +133,7 @@ export function GroupDetailPage() {
     );
 
   return (
-    <div className="max-w-8xl mx-auto py-4 ">
+    <div className="max-w-8xl mx-auto py-4">
       {/* Back */}
       <Button
         variant="ghost"
@@ -105,7 +164,6 @@ export function GroupDetailPage() {
                 <Badge variant="secondary" className="text-xs capitalize">
                   {group.category}
                 </Badge>
-
               </div>
               <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
                 {group.description}
@@ -123,6 +181,7 @@ export function GroupDetailPage() {
               </div>
             </div>
 
+            {/* ── Context menu (expanded) ── */}
             <div className="flex gap-2 flex-shrink-0">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -130,7 +189,8 @@ export function GroupDetailPage() {
                     <MoreVertical className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
+                <DropdownMenuContent align="end" className="w-52">
+                  {/* ── Invite code actions (always visible) ── */}
                   <DropdownMenuItem
                     onClick={() => regen(groupId)}
                     disabled={regening}
@@ -145,6 +205,38 @@ export function GroupDetailPage() {
                       }
                     >
                       Copy Code: {group.invitationCode}
+                    </DropdownMenuItem>
+                  )}
+
+                  {/* ── Creator-only actions ── */}
+                  {isCreator && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => setUpdateOpen(true)}>
+                        <Pencil className="h-4 w-4 mr-2" />
+                        Edit Group
+                      </DropdownMenuItem>
+                    </>
+                  )}
+
+                  {/* ── Danger zone ── */}
+                  <DropdownMenuSeparator />
+                  {!isCreator && (
+                    <DropdownMenuItem
+                      onClick={() => setLeaveOpen(true)}
+                      className="text-destructive focus:text-destructive"
+                    >
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Leave Group
+                    </DropdownMenuItem>
+                  )}
+                  {isCreator && (
+                    <DropdownMenuItem
+                      onClick={() => setDeleteOpen(true)}
+                      className="text-destructive focus:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete Group
                     </DropdownMenuItem>
                   )}
                 </DropdownMenuContent>
@@ -195,7 +287,7 @@ export function GroupDetailPage() {
           <div className="flex items-center justify-between">
             <h2 className="font-semibold text-sm">Group Members</h2>
             <Badge className="bg-primary/10 text-primary border-0 text-xs">
-              {membersRes?.pagination.totalItems ?? members.length}
+              {membersRes?.pagination?.totalItems ?? members.length}
             </Badge>
           </div>
 
@@ -214,7 +306,12 @@ export function GroupDetailPage() {
           ) : (
             <div className="space-y-1">
               {members.map((member) => (
-                <MemberItem key={member.id} member={member} />
+                <MemberItem
+                  key={member.id}
+                  member={member}
+                  isCreator={isCreator}
+                  onKick={(m) => setKickTarget(m)}
+                />
               ))}
             </div>
           )}
@@ -226,6 +323,68 @@ export function GroupDetailPage() {
           </Button>
         </div>
       </div>
+
+      {/* ── Dialogs ── */}
+      <UpdateGroupDialog
+        open={updateOpen}
+        onOpenChange={setUpdateOpen}
+        group={group}
+      />
+
+      <KickMemberDialog
+        open={!!kickTarget}
+        onOpenChange={(o) => !o && setKickTarget(null)}
+        groupId={groupId}
+        member={kickTarget}
+      />
+
+      {/* Leave confirmation */}
+      <AlertDialog open={leaveOpen} onOpenChange={setLeaveOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Leave group?</AlertDialogTitle>
+            <AlertDialogDescription>
+              You will lose access to{" "}
+              <span className="font-semibold text-foreground">{group.name}</span>.
+              You can rejoin later if the group is public or with an invite code.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={leaving}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleLeaveConfirm}
+              disabled={leaving}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {leaving ? "Leaving..." : "Leave Group"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete confirmation */}
+      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete group?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete{" "}
+              <span className="font-semibold text-foreground">{group.name}</span>{" "}
+              and remove all members. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting ? "Deleting..." : "Delete Group"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
@@ -233,8 +392,7 @@ export function GroupDetailPage() {
 // ─── Activity Item ─────────────────────────────────────────────────────────────
 
 function ActivityItem({ activity }: { activity: GroupActivity }) {
-  const resourceUrl =
-    activity.metadata?.resourceUrl as string | undefined;
+  const resourceUrl = activity.metadata?.resourceUrl as string | undefined;
 
   return (
     <div className="flex items-start gap-3 rounded-xl p-3 hover:bg-muted/50 transition-colors">
@@ -284,14 +442,25 @@ function ActivityItem({ activity }: { activity: GroupActivity }) {
 
 // ─── Member Item ───────────────────────────────────────────────────────────────
 
-function MemberItem({ member }: { member: GroupMember }) {
-  const isStudying = member.role === "creator"; // placeholder until sessions API
+function MemberItem({
+  member,
+  isCreator,
+  onKick,
+}: {
+  member: GroupMember;
+  isCreator: boolean;
+  onKick: (member: GroupMember) => void;
+}) {
+  const isStudying = member.role === "creator";
+  const canKick = isCreator && member.role === "creator";
 
   return (
     <div
       className={cn(
         "rounded-xl p-3 transition-colors",
-        isStudying ? "bg-primary/5 border border-primary/20" : "hover:bg-muted/50"
+        isStudying
+          ? "bg-primary/5 border border-primary/20"
+          : "hover:bg-muted/50"
       )}
     >
       <div className="flex items-center gap-3">
@@ -319,11 +488,24 @@ function MemberItem({ member }: { member: GroupMember }) {
           </p>
         </div>
 
-        {member.role === "creator" && (
-          <Badge variant="outline" className="text-[10px] flex-shrink-0">
-            Creator
-          </Badge>
-        )}
+        <div className="flex items-center gap-1.5 flex-shrink-0">
+          {member.role === "creator" && (
+            <Badge variant="outline" className="text-[10px]">
+              Creator
+            </Badge>
+          )}
+          {canKick && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+              onClick={() => onKick(member)}
+              title="Remove member"
+            >
+              <UserMinus className="h-3.5 w-3.5" />
+            </Button>
+          )}
+        </div>
       </div>
 
       {member.isTopPerformer && (

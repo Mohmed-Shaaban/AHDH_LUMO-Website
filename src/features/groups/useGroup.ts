@@ -10,8 +10,17 @@ import {
   joinGroupByCode,
   postGroupActivity,
   regenerateInviteCode,
-} from "@/services/groups/group.api"; 
-import type { CreateGroupPayload, PostActivityPayload } from "@/types";
+  kickMember,
+  deleteGroup,
+  leaveGroup,
+  updateGroup,
+} from "@/services/groups/group.api";
+
+import type {
+  CreateGroupPayload,
+  PostActivityPayload,
+  UpdateGroupPayload,
+} from "@/types";
 
 // ─── Query Keys ───────────────────────────────────────────────────────────────
 
@@ -22,6 +31,17 @@ export const groupKeys = {
   detail: (id: number) => [...groupKeys.all, "detail", id] as const,
   members: (id: number) => [...groupKeys.all, "members", id] as const,
   activity: (id: number) => [...groupKeys.all, "activity", id] as const,
+};
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+const invalidateGroupActivity = (
+  qc: ReturnType<typeof useQueryClient>,
+  groupId: number
+) => {
+  qc.invalidateQueries({
+    queryKey: groupKeys.activity(groupId),
+  });
 };
 
 // ─── Queries ──────────────────────────────────────────────────────────────────
@@ -63,8 +83,10 @@ export const useGroupActivity = (id: number) =>
 
 export const useCreateGroup = () => {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: (payload: CreateGroupPayload) => createGroup(payload),
+
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: groupKeys.lists() });
       qc.invalidateQueries({ queryKey: groupKeys.mine() });
@@ -74,19 +96,27 @@ export const useCreateGroup = () => {
 
 export const useJoinGroup = () => {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: (id: number) => joinGroup(id),
+
     onSuccess: (_, id) => {
       qc.invalidateQueries({ queryKey: groupKeys.detail(id) });
       qc.invalidateQueries({ queryKey: groupKeys.lists() });
+      qc.invalidateQueries({ queryKey: groupKeys.mine() });
+
+      // member_joined
+      invalidateGroupActivity(qc, id);
     },
   });
 };
 
 export const useJoinGroupByCode = () => {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: (code: string) => joinGroupByCode(code),
+
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: groupKeys.all });
     },
@@ -95,21 +125,87 @@ export const useJoinGroupByCode = () => {
 
 export const usePostActivity = (groupId: number) => {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: (payload: PostActivityPayload) =>
       postGroupActivity(groupId, payload),
+
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: groupKeys.activity(groupId) });
+      invalidateGroupActivity(qc, groupId);
     },
   });
 };
 
 export const useRegenerateCode = () => {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: (id: number) => regenerateInviteCode(id),
+
     onSuccess: (_, id) => {
       qc.invalidateQueries({ queryKey: groupKeys.detail(id) });
+    },
+  });
+};
+
+export const useUpdateGroup = (id: number) => {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: UpdateGroupPayload) => updateGroup(id, payload),
+
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: groupKeys.detail(id) });
+      qc.invalidateQueries({ queryKey: groupKeys.lists() });
+      qc.invalidateQueries({ queryKey: groupKeys.mine() });
+
+      // group_updated
+      invalidateGroupActivity(qc, id);
+    },
+  });
+};
+
+export const useLeaveGroup = () => {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number) => leaveGroup(id),
+
+    onSuccess: (_, id) => {
+      qc.invalidateQueries({ queryKey: groupKeys.detail(id) });
+      qc.invalidateQueries({ queryKey: groupKeys.lists() });
+      qc.invalidateQueries({ queryKey: groupKeys.mine() });
+
+      // member_left
+      invalidateGroupActivity(qc, id);
+    },
+  });
+};
+
+export const useDeleteGroup = () => {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number) => deleteGroup(id),
+
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: groupKeys.all });
+    },
+  });
+};
+
+export const useKickMember = (groupId: number) => {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: (userId: number) => kickMember(groupId, userId),
+
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: groupKeys.members(groupId) });
+      qc.invalidateQueries({ queryKey: groupKeys.detail(groupId) });
+
+      // member_left
+      invalidateGroupActivity(qc, groupId);
     },
   });
 };
