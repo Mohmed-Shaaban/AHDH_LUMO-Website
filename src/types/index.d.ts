@@ -182,4 +182,187 @@ export interface UpdateGroupPayload {
   tags?: string[];
 }
 
+// ─── Habit Types ────────────────────────────────────────────────────────────
+// Add these to your existing src/types/index.ts file
+
+export type HabitFrequency = "daily" | "weekly" | "interval";
+export type HabitGoalType = "once" | "count" | "duration";
+export type HabitCategory =
+  | "health"
+  | "fitness"
+  | "productivity"
+  | "mindfulness"
+  | "learning"
+  | "social"
+  | "finance"
+  | "other";
+
+export interface Habit {
+  id: number;
+  title: string;
+  description: string | null;
+  frequency: HabitFrequency;
+  scheduledDays: string[];
+  intervalDays: number | null;
+  scheduledTime: string | null;
+  reminderEnabled: boolean;
+  goalType: HabitGoalType;
+  goalTarget: number;
+  isTimed: boolean;
+  estimatedDuration: number | null;
+  currentStreak: number;
+  longestStreak: number;
+  totalCompletions: number;
+  category: HabitCategory;
+  createdByType: string;
+  isActive: boolean;
+  lastCompletedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface HabitWithProgress extends Habit {
+  todayProgress: TodayProgress;
+}
+
+export interface TodayProgress {
+  completedCount: number;
+  goalTarget: number;
+  isCompleted: boolean;
+  isTimerRunning: boolean;
+  activeTimerStartTime: string | null;
+}
+
+export interface HabitCompletion {
+  id: number;
+  habitId: number;
+  userId: number;
+  completedAt: string;
+  completionDate: string;
+  value: number;
+  startTime: string | null;
+  endTime: string | null;
+  duration: number | null;
+  isTimerRunning: boolean;
+  notes: string | null;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+  createdBy: number | null;
+  updatedBy: number | null;
+  deletedBy: number | null;
+}
+
+export interface CheckHabitResponse {
+  completion: HabitCompletion;
+  progress: {
+    completedCount: number;
+    goalTarget: number;
+    isCompleted: boolean;
+  };
+}
+
+export interface UncheckHabitResponse {
+  progress: {
+    completedCount: number;
+    goalTarget: number;
+    isCompleted: boolean;
+  };
+}
+
+export interface TimerStartResponse extends HabitCompletion {}
+
+export interface TimerStopResponse {
+  completion: HabitCompletion;
+  progress: {
+    completedCount: number;
+    goalTarget: number;
+    isCompleted: boolean;
+    sessionDuration: number;
+  };
+}
+
+export interface WeeklyOverviewDay {
+  date: string;
+  dayOfWeek: number;
+  isScheduled: boolean;
+  wasCompleted: boolean;
+}
+
+export interface WeeklyHabitData {
+  habitId: number;
+  title: string;
+  category: HabitCategory;
+  completedDays: number;
+  scheduledDays: number;
+  completionRate: number;
+  days: WeeklyOverviewDay[];
+}
+
+export interface WeeklyOverviewResponse {
+  weekStartDate: string;
+  weekEndDate: string;
+  habits: WeeklyHabitData[];
+}
+
+export interface HabitStreak {
+  habitId: number;
+  title: string;
+  category: HabitCategory;
+  currentStreak: number;
+  longestStreak: number;
+  totalCompletions: number;
+}
+
+export interface DailySummary {
+  date: string;
+  totalScheduled: number;
+  totalCompleted: number;
+  totalSkipped: number;
+  completionRate: number;
+  completedHabits: { habitId: number; title: string; count: number }[];
+  skippedHabits: { habitId: number; title: string }[];
+}
+
+export interface HabitStats {
+  habitId: number;
+  title: string;
+  currentStreak: number;
+  longestStreak: number;
+  totalCompletions: number;
+  last30Days: {
+    completedDays: number;
+    totalDays: number;
+    completionRate: number;
+    totalDuration: number;
+  };
+}
+
+export interface CreateHabitPayload {
+  title: string;
+  description?: string;
+  frequency: HabitFrequency;
+  scheduledDays: number[];
+  scheduledTime?: string | null;
+  reminderEnabled?: boolean;
+  goalType: HabitGoalType;
+  goalTarget?: number;
+  isTimed?: boolean;
+  estimatedDuration?: number | null;
+  category: HabitCategory;
+}
+
+export interface UpdateHabitPayload extends Partial<CreateHabitPayload> {
+  id: number;
+}
+
+export interface CheckHabitPayload {
+  notes?: string;
+}
+
+export interface StopTimerPayload {
+  notes?: string;
+}
+
+
 
