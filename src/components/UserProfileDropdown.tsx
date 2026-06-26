@@ -15,6 +15,7 @@ const UserProfileDropdown = () => {
   const navigate = useNavigate();
   const { logout } = useLogout();
   const { isLoadingUser, dataUser } = useAuthContext();
+  console.log(dataUser)
 
   if (isLoadingUser) {
     return <Skeleton className="h-24 w-64 rounded-md" />;
@@ -34,7 +35,7 @@ const UserProfileDropdown = () => {
       <DropdownMenuLabel className="flex flex-col gap-1 px-2 py-3">
         <div className="flex items-center gap-2">
           <Avatar className="h-10 w-10">
-            <AvatarImage src={dataUser.profilePicture ?? ''} />
+            <AvatarImage src={import.meta.env.VITE_API_URL+dataUser.profilePicture || ''} />
             <AvatarFallback>{initials}</AvatarFallback>
           </Avatar>
           <div className="flex flex-col">

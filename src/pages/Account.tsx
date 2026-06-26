@@ -16,6 +16,7 @@ import {
 import { toast } from "sonner";
 import type { UpdateProfilePayload } from "@/types";
 import { useDeleteProfilePicture, useProfile, useUpdateProfile, useUploadProfilePicture } from "@/features/profile/useProfile";
+import axiosInstance from "@/services/axiosInstance";
 
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -176,7 +177,7 @@ console.log(profile)
             <div className="relative h-24 w-24 overflow-hidden rounded-full bg-muted ">
               {avatarSrc ? (
                 <img
-                  src={profile?.profilePicture}
+                  src={import.meta.env.VITE_API_URL+profile?.profilePicture}
                   alt="Profile"
                   className="h-full w-full object-cover "
                 />
