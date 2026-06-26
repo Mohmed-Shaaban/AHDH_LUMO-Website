@@ -364,5 +364,33 @@ export interface StopTimerPayload {
   notes?: string;
 }
 
-
+export interface UserProfile {
+  id: number;
+  username: string;
+  email: string;
+  fullName: string;
+  firstName: string | null;
+  lastName: string | null;
+  about: string | null;
+  profilePicture: string;
+  timezone: string;
+  preferences: Record<string, unknown>;
+  isActive: boolean;
+  emailVerified: boolean;
+  lastLoginAt: string | null;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}
+ 
+export interface UpdateProfilePayload {
+  firstName?: string;
+  lastName?: string;
+  about?: string;
+  timezone?: string;
+  dateFormat?: string;
+  timeFormat?: string;
+  weekStartOn?: string;
+  language?: string;
+}
 
