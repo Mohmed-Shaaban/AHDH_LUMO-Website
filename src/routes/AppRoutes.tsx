@@ -21,6 +21,9 @@ import Overview from '@/pages/dashboard/Overview';
 import Groups from '@/pages/Groups';
 import Progress from '@/pages/Progress';
 import { GroupDetailPage } from '@/pages/GroupDetailPage';
+import OnboardingLayout from '@/components/layouts/OnboardingLayout';
+import OnboardingGuard from '@/components/OnboardingGuard';
+import { OnboardingPage } from '@/pages/OnboardingPage';
 
 const router = createBrowserRouter([
   {
@@ -74,6 +77,31 @@ const router = createBrowserRouter([
     ],
   },
   {
+  element: <OnboardingLayout />,
+  errorElement: <ErrorPage />,
+  children: [
+    buildRoute({
+      config: routes.ONBOARDING,
+      element: (
+        <OnboardingPage
+          onComplete={() => {
+            // handled via OnboardingGuard below, but
+            // you can also navigate here directly:
+            window.location.replace(routes.DASHBOARD.index.path);
+          }}
+        />
+      ),
+      extraWrappers: [
+        {
+          redirectPath: routes.DASHBOARD.index.path,
+          shouldRedirectIfLoggedIn: false, // requires auth
+          isFullScreenLoader: true,
+        },
+      ],
+    }),
+  ],
+},
+  {
     element: <HomeLayout />,
     errorElement: <ErrorPage />,
     children: [
@@ -94,9 +122,13 @@ const router = createBrowserRouter([
     ],
   },
   {
-    element: <DashboardLayout />,
+    element: <OnboardingGuard />,
     errorElement: <ErrorPage />,
-    children: [
+    children:[
+      {
+          element: <DashboardLayout />,
+          errorElement: <ErrorPage />,
+              children: [
       buildRoute({
         config: routes.DASHBOARD.index,
         element: <Overview />,
@@ -187,6 +219,9 @@ const router = createBrowserRouter([
       }),
       
     ],
+      }
+    ]
+
   },
   {
     path: '*',

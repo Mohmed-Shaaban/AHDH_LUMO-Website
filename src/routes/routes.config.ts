@@ -30,6 +30,8 @@ export const routes: RoutesMap<typeof PATHS> = {
   },
   TERMS: {
     path: PATHS.TERMS,
+  }, ONBOARDING: {
+    path: PATHS.ONBOARDING,   
   },
     DASHBOARD: {
     index: {path:PATHS.DASHBOARD.index},

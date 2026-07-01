@@ -60,6 +60,7 @@ export const PATHS = {
   VERIFY_EMAIL: '/verify-email',
   FORGET_PASSWORD: '/forget-password',
   TERMS: '/terms-of-service',
+  ONBOARDING: '/onboarding', 
   DASHBOARD: buildRouteGroup('/dash', {
     tasks:'/tasks',
     habit:'/habits',
