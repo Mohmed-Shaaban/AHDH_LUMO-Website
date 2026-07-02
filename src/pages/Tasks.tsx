@@ -160,7 +160,7 @@ const Tasks = () => {
   if(loadingSections) return <Spinner/>
 
   return (
-    <div className="flex-1 flex flex-col gap-y-5 max-w-6xl mx-auto">
+    <div className="flex-1 flex flex-col pb-10 gap-y-7 max-w-6xl mx-auto">
       {
         sectionsData?.length === 0 ? <div>
           <p>No sections Add one</p>

@@ -49,7 +49,7 @@ function Habits() {
           </div>
           <Button
             onClick={() => setModalOpen(true)}
-            className="gap-2 bg-violet-600 hover:bg-violet-700 text-white rounded-xl shadow-sm"
+            className="gap-2 bg-[#9575CD] hover:bg-[#9984bc] text-white rounded-xl shadow-sm"
           >
             <Plus className="h-4 w-4" />
             Add Habit
@@ -73,7 +73,7 @@ function Habits() {
               <Button
                 onClick={() => setModalOpen(true)}
                 variant="outline"
-                className="mt-4 gap-2 rounded-xl border-violet-200 text-violet-600 hover:bg-violet-50"
+                className="mt-4 gap-2 rounded-xl border-violet-200 bg-[#9575CD]  hover:bg-violet-50"
               >
                 <Plus className="h-4 w-4" />
                 Add Habit

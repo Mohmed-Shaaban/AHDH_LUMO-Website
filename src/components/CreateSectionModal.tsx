@@ -63,7 +63,7 @@ export default function CreateSectionModal() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-indigo-900">
+        <Button className="bg-[#9575CD]">
           <Plus className="mr-2 h-4 w-4" />
           Create Section
         </Button>

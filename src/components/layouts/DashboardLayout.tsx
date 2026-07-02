@@ -21,7 +21,7 @@ const DashboardContent = () => {
     >
       {/* <Navbar /> */}
       <main className="dark:bg-background flex-1 ">
-        <div className="mx-auto  sm:px-6! lg:px-8! h-full flex bg-[#F4F1FA]">
+        <div className="mx-auto  sm:px-6! lg:px-8! h-full pt-10 flex bg-[#F4F1FA]">
           <Toaster className="select-none" />
           <Outlet />
         </div>

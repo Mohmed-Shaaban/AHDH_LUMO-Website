@@ -86,7 +86,7 @@ const AppSidebar = () => {
                 >
                   <SidebarMenuButton
                     className={`${
-                      isActive ? 'bg-indigo-800' : ''
+                      isActive ? 'bg-[#9575CD] text-white' : ''
                     } rounded-md py-5! px-2!`}
                     asChild
                   >
@@ -110,7 +110,7 @@ const AppSidebar = () => {
                 location.pathname.startsWith(
                   routes.DASHBOARD.profile.path
                 )
-                  ? 'bg-indigo-800'
+                  ? 'bg-[#9575CD]'
                   : ''
               } rounded-md !py-5 !px-2`}
               asChild
