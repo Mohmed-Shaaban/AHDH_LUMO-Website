@@ -1,175 +1,45 @@
 import CreateSectionModal from '@/components/CreateSectionModal';
 import { TaskBoard } from '@/components/TaskBoard';
+import TasksFlatList from '@/components/TasksFlatList';
+import TaskSplitterSheet from '@/components/TaskSplitterSheet';
 import { Spinner } from '@/components/ui/spinner';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import useSections from '@/features/sections/useSections';
+// import TaskSplitterSheet from '@/features/taskSplitter/TaskSplitterSheet';
+// import TasksFlatList from '@/features/tasks/TasksFlatList';
 import type { Section } from '@/types';
 
-
-/*
-
-createdAt
-: 
-"2026-04-13T14:26:56.465Z"
-description
-: 
-"English course tasks"
-id
-: 
-1
-name
-: 
-"English"
-order
-: 
-0
-updatedAt
-: 
-"2026-04-13T14:26:56.465Z"
-
-(
-task
-
-{status: true, message: 'Operation completed successfully', data: Array(1), meta: {…}, pagination: {…}}
-data
-: 
-Array(1)
-0
-: 
-actualDuration
-: 
-null
-completedAt
-: 
-null
-createdAt
-: 
-"2026-04-13T14:22:07.710Z"
-createdByType
-: 
-"user"
-description
-: 
-"Read and complete chapter 3 exercises"
-difficultyLevel
-: 
-"easy"
-dueDate
-: 
-"2025-09-21T00:00:00.000Z"
-estimatedDuration
-: 
-240
-id
-: 
-2
-priority
-: 
-"high"
-sectionId
-: 
-null
-status
-: 
-"pending"
-tags
-: 
-['English']
-title
-: 
-"Complete ch3"
-updatedAt
-: 
-"2026-04-13T14:22:07.710Z"
-[[Prototype]]
-: 
-Object
-length
-: 
-1
-[[Prototype]]
-: 
-Array(0)
-message
-: 
-"Operation completed successfully"
-meta
-: 
-{timestamp: '2026-05-07T08:56:06.804Z', path: '/tasks'}
-pagination
-: 
-{page: 1, limit: 10, totalItems: 2, totalPages: 1, links: {…}}
-status
-: 
-true
-
-
-
-)
-
-
-
-*/
-
 const Tasks = () => {
-  const {sections:sectionsData,loadingSections} = useSections()
-  console.log(sectionsData)
-  // useEffect(() => {
-  //   const getResponse = async () => {
-  //     try {
-  //       // Use 'api' instead of 'fetch' so your middleware/interceptors work
-  //       const res = await axiosInstance.get('/tasks'); 
-        
-  //       console.log("--- Axios Response Data ---");
-  //       console.log(res.data); // Axios puts the response body in .data
-  //     } catch (error: unknown) {
-  //       if(axios.isAxiosError(error))
-  //       console.error("Axios error:", error.response?.status, error.message);
-  //     }
-  //   };
+  const { sections: sectionsData, loadingSections } = useSections();
 
-  //   getResponse();
-  // }, []);
-
-//   const SECTIONS: Section[] = [
-//   {
-//     id: 1,
-//     name: "Pending",
-//     description: "Tasks yet to be done",
-//     order: 0,
-//     createdAt: new Date().toISOString(),
-//     updatedAt: new Date().toISOString(),
-//   },
-//   {
-//     id: 2,
-//     name: "Completed",
-//     description: "Finished tasks",
-//     order: 1,
-//     createdAt: new Date().toISOString(),
-//     updatedAt: new Date().toISOString(),
-//   },
-//   {
-//     id: 3,
-//     name: "English",
-//     description: "English course tasks",
-//     order: 2,
-//     createdAt: new Date().toISOString(),
-//     updatedAt: new Date().toISOString(),
-//   },
-// ];
-
-  if(loadingSections) return <Spinner/>
+  if (loadingSections) return <Spinner />;
 
   return (
     <div className="flex-1 flex flex-col pb-10 gap-y-7 max-w-6xl mx-auto">
-      {
-        sectionsData?.length === 0 ? <div>
-          <p>No sections Add one</p>
-        </div>:
-      <TaskBoard sections={sectionsData as Section[]}/>
-      }
-      <div>
-        <CreateSectionModal/>
-      </div>
+      <Tabs defaultValue="sections">
+        <div className="flex items-center justify-between">
+          <TabsList>
+            <TabsTrigger value="sections">Sections</TabsTrigger>
+            <TabsTrigger value="tasks">All Tasks</TabsTrigger>
+          </TabsList>
+          <div className="flex items-center gap-3">
+            <CreateSectionModal />
+            <TaskSplitterSheet />
+          </div>
+        </div>
+
+        <TabsContent value="sections" className="mt-4">
+          {sectionsData?.length === 0 ? (
+            <p>No sections. Add one.</p>
+          ) : (
+            <TaskBoard sections={sectionsData as Section[]} />
+          )}
+        </TabsContent>
+
+        <TabsContent value="tasks" className="mt-4">
+          <TasksFlatList />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

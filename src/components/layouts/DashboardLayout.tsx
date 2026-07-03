@@ -3,6 +3,7 @@ import { Toaster } from 'sonner';
 import { Navbar } from '../Navbar';
 import AppSidebar from '../AppSidebar';
 import { SidebarInset, SidebarProvider, useSidebar } from '../ui/sidebar';
+import FloatingAssistant from '../FloatingAssistant';
 
 const DashboardContent = () => {
   const { state, isMobile } = useSidebar();
@@ -38,6 +39,7 @@ const DashboardLayout = () => {
         <AppSidebar />
         <DashboardContent />
       </SidebarProvider>
+      <FloatingAssistant />
     </>
   );
 };

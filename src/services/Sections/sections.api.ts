@@ -13,3 +13,9 @@ export const createSection = async (data: createSectionType) => {
 
   return response.data;
 };
+
+export const deleteSection = async (id: number | string) => {
+  const response = await axiosInstance.delete(`/sections/${id}`);
+
+  return response.data;
+};

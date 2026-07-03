@@ -13,6 +13,7 @@ import type { Section } from "@/types";
 import { useTasksBySection } from "@/features/tasks/useTasks";
 import { TaskRow } from "./TaskRow";
 import { AddTaskRow } from "./AddTaskRow";
+import { useDeleteSection } from "@/features/sections/useCreateSection";
 
 // import type { Section } from "../../types";
 // import { useTasksBySection } from "../../hooks/useTasks";
@@ -46,9 +47,14 @@ function getSectionStatus(tasks: ReturnType<typeof useTasksBySection>["data"]) {
 export function SectionCard({ section }: SectionCardProps) {
   const [collapsed, setCollapsed] = useState(false);
   const { data: tasks, isLoading, isError } = useTasksBySection(section.id);
+  const { mutateDeleteSection } = useDeleteSection();
 
   const status = getSectionStatus(tasks);
   const style = STATUS_STYLE[status];
+
+  const handleDelete = (id: number) => {
+  mutateDeleteSection(id);
+};
 
   return (
     <div className="rounded-xl border bg-card shadow-sm overflow-hidden ">
@@ -88,7 +94,7 @@ export function SectionCard({ section }: SectionCardProps) {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-40">
               <DropdownMenuItem>Rename section</DropdownMenuItem>
-              <DropdownMenuItem className="text-destructive focus:text-destructive">
+              <DropdownMenuItem onClick={() => handleDelete(section.id)} className="text-destructive focus:text-destructive">
                 Delete section
               </DropdownMenuItem>
             </DropdownMenuContent>
