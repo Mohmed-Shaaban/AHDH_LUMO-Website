@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { AxiosError } from 'axios';
 import { useAssistantStore } from '@/providers/context/assistantStore';
-import { postAssistantChat, postCbtMessage, postCbtSessionStart } from '@/services/ai/ai.api';
+import { patchCbtEnd, postAssistantChat, postCbtMessage, postCbtSessionStart } from '@/services/ai/ai.api';
 
 
 const handleAiError = (err: unknown) => {
@@ -87,6 +87,40 @@ export const useCbtMessage = () => {
     onSuccess: (data) => {
       addMessage({ id: crypto.randomUUID(), role: 'assistant', text: data.reply });
       if (data.sessionEnded) endCbtSession();
+    },
+    onError: handleAiError,
+  });
+};
+
+export const useQuickTaskAction = () => {
+  const { conversation, addMessage, pushConversationTurn } = useAssistantStore();
+
+  return useMutation({
+    mutationFn: (params: { name: 'delete_task' | 'complete_task'; taskId: number }) =>
+      postAssistantChat({
+        message: '__confirm__',
+        conversation,
+        context: {
+          confirm_tool: { name: params.name, args: { id: params.taskId } },
+        },
+      }),
+    onSuccess: (data) => {
+      pushConversationTurn({ role: 'assistant', text: data.reply });
+      addMessage({ id: crypto.randomUUID(), role: 'assistant', text: data.reply, tool: data.tool });
+    },
+    onError: handleAiError,
+  });
+};
+
+export const useEndCbt = () => {
+  const { cbtSessionId, resetChat } = useAssistantStore();
+  return useMutation({
+    mutationFn: () => {
+      if (!cbtSessionId) throw new Error('No active CBT session');
+      return patchCbtEnd(cbtSessionId);
+    },
+    onSuccess: () => {
+      resetChat();
     },
     onError: handleAiError,
   });

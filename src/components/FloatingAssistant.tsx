@@ -1,12 +1,18 @@
 import { useState } from 'react';
-import { MessageCircle, X, Send, Loader2, Check, Pencil } from 'lucide-react';
+import { format } from 'date-fns';
+import { MessageCircle, X, Send, Loader2, Check, Pencil, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+// import { useAssistantStore } from '@/store/assistantStore';
+import {
+  useAssistantChat,
+  useConfirmTool,
+  useCbtMessage,
+  useEndCbt,
+} from '@/features/ai/useAssistant';
+import ToolResultRenderer from './ToolResultRenderer';
 import { cn } from '@/lib/utils';
 import { useAssistantStore } from '@/providers/context/assistantStore';
-import { useAssistantChat, useCbtMessage, useConfirmTool } from '@/features/ai/useAssistant';
-import { format } from 'date-fns';
-import ToolResultRenderer from './ToolResultRenderer';
 
 const FloatingAssistant = () => {
   const [input, setInput] = useState('');
@@ -19,8 +25,13 @@ const FloatingAssistant = () => {
   const chatMutation = useAssistantChat();
   const confirmMutation = useConfirmTool();
   const cbtMutation = useCbtMessage();
+  const endCbtMutation = useEndCbt();
 
-  const isPending = chatMutation.isPending || confirmMutation.isPending || cbtMutation.isPending;
+  const isPending =
+    chatMutation.isPending ||
+    confirmMutation.isPending ||
+    cbtMutation.isPending ||
+    endCbtMutation.isPending;
 
   const handleSend = () => {
     const text = input.trim();
@@ -64,37 +75,37 @@ const FloatingAssistant = () => {
                 Not medical advice. In crisis, call 08008880700.
               </p>
             )}
-                     <div className="flex flex-col gap-2">
-  {messages.map((m) => (
-    <div
-      key={m.id}
-      className={cn(
-        'flex flex-col gap-0.5',
-        m.role === 'user' ? 'items-end' : 'items-start',
-      )}
-    >
-      <div
-        className={cn(
-          'max-w-[85%] rounded-xl px-3 py-2 text-sm',
-          m.role === 'user'
-            ? 'bg-purple-600 text-white'
-            : 'bg-white/10 text-white',
-        )}
-      >
-        {m.text}
-        {m.role === 'assistant' && m.tool && <ToolResultRenderer tool={m.tool} />}
-      </div>
-      <span className="px-1 text-[10px] text-white/30">
-        {format(new Date(m.createdAt), 'HH:mm')}
-      </span>
-    </div>
-  ))}
-  {isPending && (
-    <div className="flex items-center gap-1 text-white/40">
-      <Loader2 className="size-3 animate-spin" /> typing…
-    </div>
-  )}
-</div>
+            <div className="flex flex-col gap-2">
+              {messages.map((m) => (
+                <div
+                  key={m.id}
+                  className={cn(
+                    'flex flex-col gap-0.5',
+                    m.role === 'user' ? 'items-end' : 'items-start',
+                  )}
+                >
+                  <div
+                    className={cn(
+                      'max-w-[85%] rounded-xl px-3 py-2 text-sm',
+                      m.role === 'user'
+                        ? 'bg-purple-600 text-white'
+                        : 'bg-white/10 text-white',
+                    )}
+                  >
+                    {m.text}
+                    {m.role === 'assistant' && m.tool && <ToolResultRenderer tool={m.tool} />}
+                  </div>
+                  <span className="px-1 text-[10px] text-white/30">
+                    {format(new Date(m.createdAt), 'HH:mm')}
+                  </span>
+                </div>
+              ))}
+              {isPending && (
+                <div className="flex items-center gap-1 text-white/40">
+                  <Loader2 className="size-3 animate-spin" /> typing…
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="border-t border-white/10 p-4">
@@ -129,6 +140,18 @@ const FloatingAssistant = () => {
                   className="border-white/10 bg-white/5"
                   disabled={isPending}
                 />
+                {mode === 'cbt' && (
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    onClick={() => endCbtMutation.mutate()}
+                    disabled={isPending}
+                    title="Exit session"
+                    className="border-white/10 bg-red-500 text-white/60 hover:text-white"
+                  >
+                    <LogOut className="size-4" />
+                  </Button>
+                )}
                 <Button size="icon" onClick={handleSend} disabled={isPending} className="bg-purple-600 hover:bg-purple-700">
                   <Send className="size-4" />
                 </Button>
