@@ -1,84 +1,81 @@
-// ─── Onboarding API Types ───────────────────────────────────────────────────
+// ─── Onboarding types — 25-question ADHD self-assessment ──────────────────────
+// Contract: LUMO-backend commit 56a4bff (see docs/from-backend/ai-endpoints-handoff.md §5)
 
+export type OnboardingCategory =
+  | "inattention"
+  | "hyperactivity"
+  | "impulsivity"
+  | "cognitive"
+  | "emotional"
+  | "somatic";
+
+export type OnboardingSeverity = "minimal" | "mild" | "moderate" | "severe";
+
+export type AdhdType = "inattentive" | "hyperactive" | "combined";
+
+/**
+ * One of the 5 fixed Likert options attached to every question by the backend.
+ * `points` is the value we POST — 0..4.
+ */
+export interface LikertOption {
+  text: string;
+  points: 0 | 1 | 2 | 3 | 4;
+}
+
+export interface OnboardingCategoryInfo {
+  id: OnboardingCategory;
+  label: string;
+  maxScore: number;
+}
+
+export interface OnboardingQuestion {
+  id: number; // 1..25
+  originalTestNumber: number;
+  text: string;
+  category: OnboardingCategory;
+  options: LikertOption[]; // always 5 items, Never..Always
+}
+
+/** Static catalog from GET /onboarding/questions. */
+export interface OnboardingQuestions {
+  totalQuestions: number; // 25
+  totalMaxScore: number; // 100
+  categories: OnboardingCategoryInfo[];
+  questions: OnboardingQuestion[];
+}
+
+/** Answers saved so far, keyed by questionId (1..25) → value (0..4). */
+export type OnboardingAnswers = Partial<Record<string, number>>;
+
+export interface OnboardingProfile {
+  severity: OnboardingSeverity;
+  adhdType: AdhdType;
+  topChallenges: OnboardingCategory[]; // top 2 by percent-of-max
+}
+
+export type OnboardingCategoryScores = Partial<Record<OnboardingCategory, number>>;
+
+/** GET /onboarding/state — progress before submit, plus scores after. */
 export interface OnboardingState {
   currentStep: number;
   totalSteps: number;
   isCompleted: boolean;
   completedAt: string | null;
-  answers: Partial<OnboardingAnswers>;
+  answers: OnboardingAnswers;
+  // Populated only once isCompleted === true.
+  categoryScores?: OnboardingCategoryScores;
+  totalScore?: number;
+  totalPercent?: number;
+  profile?: OnboardingProfile;
 }
 
-export interface OnboardingAnswers {
-  occupation: Occupation;
-  language: Language;
-  learningStyle: LearningStyle;
-  motivations: Motivation[];
-  challenges: Challenge[];
-  focusTimeOfDay: FocusTimeOfDay;
-  primaryGoal: PrimaryGoal;
-  adhdSeverity: AdhdSeverity;
-  focusDuration: FocusDuration;
-  adhdType: AdhdType;
+/** Body for POST /onboarding/answer. */
+export interface OnboardingAnswerPayload {
+  questionId: number; // 1..25
+  value: number; // 0..4
 }
 
-// ─── Valid Values per endpoint ───────────────────────────────────────────────
-
-export type Occupation =
-  | "student"
-  | "developer"
-  | "doctor"
-  | "designer"
-  | "teacher"
-  | "freelancer"
-  | "parent"
-  | "other";
-
-export type Language = "arabic" | "english" | "mixed";
-
-export type LearningStyle = "visual" | "auditory" | "kinesthetic" | "reading";
-
-export type Motivation =
-  | "points"
-  | "streaks"
-  | "praise"
-  | "badges"
-  | "visual_progress";
-
-export type Challenge =
-  | "procrastination"
-  | "overwhelm"
-  | "distraction"
-  | "time_blindness"
-  | "impulsivity"
-  | "forgetfulness";
-
-export type FocusTimeOfDay = "morning" | "afternoon" | "evening";
-
-export type PrimaryGoal = "personal" | "occupation_specific" | "general";
-
-export type AdhdSeverity = "mild" | "moderate" | "severe";
-
-export type FocusDuration = "5-10" | "10-15" | "15-20" | "20-25" | "25-30";
-
-export type AdhdType = "inattentive" | "hyperactive" | "combined";
-
-// ─── Question Config Types ───────────────────────────────────────────────────
-
-export type QuestionType = "single" | "multi";
-
-export interface QuestionOption {
-  value: string;
-  label: string;
-  sublabel?: string; // for Arabic subtitles
-}
-
-export interface QuestionConfig {
-  step: number; // 1-based, matches q1..q10
-  endpoint: string; // e.g. "q1"
-  fieldName: keyof OnboardingAnswers;
-  type: QuestionType;
-  title: string;
-  subtitle: string;
-  options: QuestionOption[];
-  bodyKey: string; // the key to POST e.g. "occupation"
+/** Body for POST /onboarding/submit (bulk mode). */
+export interface OnboardingSubmitPayload {
+  answers?: OnboardingAnswerPayload[];
 }
