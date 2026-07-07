@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils';
 import React, { useEffect, useRef, useState } from 'react';
+import { Smile } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { Button } from './ui/button';
 import HamburgerIconSVG from './svg/HamburgerIconSVG';
@@ -12,6 +13,23 @@ import ThemeToggle from './ThemeToggle';
 import DropDownUser from './DropDownUser';
 import Logo from './Logo';
 import { useNavigate } from 'react-router';
+import { useMoodPromptStore } from '@/providers/context/moodPromptStore';
+
+const LogMoodButton = () => {
+  const openWith = useMoodPromptStore((s) => s.openWith);
+  return (
+    <Button
+      variant="ghost"
+      size="icon"
+      aria-label="Log mood"
+      title="Log mood"
+      onClick={() => openWith({ source: 'manual' })}
+      className="text-purple-600 hover:bg-purple-50 hover:text-purple-700 dark:text-purple-300 dark:hover:bg-purple-500/10"
+    >
+      <Smile className="size-5" />
+    </Button>
+  );
+};
 
 export interface NavbarNavLink {
   href: string;
@@ -164,6 +182,7 @@ export const Navbar = React.forwardRef<HTMLElement, NavbarProps>(
             </div>
           </div>
           <div className="flex items-center gap-3">
+            <LogMoodButton />
             {/* Profile Menu */}
             <DropDownUser />
             <ThemeToggle />

@@ -1,5 +1,6 @@
 import { taskApi } from "@/services/tasks/tasks.api";
 import type { CreateTaskPayload, UpdateTaskPayload } from "@/types";
+import { useMoodPromptStore } from "@/providers/context/moodPromptStore";
 import {
   useMutation,
   useQuery,
@@ -49,8 +50,18 @@ export function useMarkTaskComplete(sectionId: number) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: number) => taskApi.markComplete(id),
-    onSuccess: () => {
+    onSuccess: (response) => {
       qc.invalidateQueries({ queryKey: taskKeys.bySection(sectionId) });
+      // Backend commit 07d1bed: /tasks/:id/complete now returns
+      // `{ task, promptMood }`. Open the mood picker when the server tells
+      // us the user hasn't logged a mood recently.
+      const { task, promptMood } = response.data;
+      if (promptMood) {
+        useMoodPromptStore.getState().openWith({
+          source: 'task',
+          taskId: task.id,
+        });
+      }
     },
   });
 }

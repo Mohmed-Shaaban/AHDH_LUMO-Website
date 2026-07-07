@@ -10,6 +10,7 @@ import { ProgressStatCards } from "@/components/ProgressStatCards";
 import { WeeklyGoalRadialCard } from "@/components/WeeklyGoalRadialCard";
 import { WeeklyOverviewHeatmap } from "@/components/WeeklyOverviewHeatmap";
 import { WeeklyTrendsChart } from "@/components/WeeklyTrendsChart";
+import { MoodTrendCard } from "@/features/moods/MoodTrendCard";
 import { useState } from "react";
 
  function Overview() {
@@ -29,6 +30,8 @@ import { useState } from "react";
             </div>
             <WeeklyOverviewHeatmap />
           </div>
+
+          <MoodTrendCard />
 
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             <CategoryBreakdown />
